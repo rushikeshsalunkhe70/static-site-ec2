@@ -15,8 +15,8 @@ body {
 
 /* Header section */
 header {
-    background-color: #172554;
-    color: white;
+    background-color: hsl(86, 62%, 49%);
+    color: #1b1212;
     text-align: center;
     padding: 50px 20px;
 }
@@ -35,7 +35,7 @@ header p {
     max-width: 700px;
     margin: 60px auto;
     padding: 40px 25px;
-    background-color: white;
+    background-color: hsl(313, 80%, 55%);
     text-align: center;
     border-radius: 12px;
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
@@ -53,7 +53,7 @@ header p {
 
 /* Button */
 button {
-    background-color: #2563eb;
+    background-color: hsl(228, 16%, 6%);
     color: white;
     border: none;
     padding: 12px 25px;
@@ -68,8 +68,8 @@ button:hover {
 
 /* Footer */
 footer {
-    background-color: #172554;
-    color: white;
+    background-color: hsl(36, 93%, 47%);
+    color: #0e0303;
     text-align: center;
     padding: 20px;
 }
