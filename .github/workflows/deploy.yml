@@ -23,26 +23,16 @@ jobs:
           if (!(Test-Path "site/script.js")) { throw "script.js missing" }
           Write-Host "Website files validated successfully"
 
-      
-      
       - name: Configure SSH
         shell: powershell
         env:
-          EC2_SSH_KEY_B64: ${{ secrets.EC2_SSH_KEY_B64 }}
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          $keyName = "ec2_deploy_key_$($env:GITHUB_RUN_ID)_$($env:GITHUB_RUN_ATTEMPT)"
-          $keyPath = Join-Path $env:RUNNER_TEMP $keyName
-
-          $keyBytes = [Convert]::FromBase64String($env:EC2_SSH_KEY_B64)
-          [System.IO.File]::WriteAllBytes($keyPath, $keyBytes)
-
+          $keyPath = Join-Path $env:RUNNER_TEMP "ec2_deploy_key"
+          [System.IO.File]::WriteAllText($keyPath, $env:EC2_SSH_KEY)
           $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
           icacls $keyPath /inheritance:r /grant:r "${identity}:(R)"
-
-          if ($LASTEXITCODE -ne 0) {
-            throw "Could not set SSH key permissions"
-          }
-
+          if ($LASTEXITCODE -ne 0) { throw "SSH key permissions failed" }
           "SSH_KEY_PATH=$keyPath" >> $env:GITHUB_ENV
 
       - name: Deploy website
@@ -56,7 +46,7 @@ jobs:
           $knownHosts = Join-Path $sshDir "known_hosts"
 
           if (!(Test-Path $knownHosts)) {
-            throw "Verified EC2 host key is not configured yet."
+            throw "EC2 known_hosts file is missing"
           }
 
           ssh -i $keyPath -o UserKnownHostsFile=$knownHosts -o StrictHostKeyChecking=yes "$($env:EC2_USER)@$($env:EC2_HOST)" "mkdir -p /home/ubuntu/deploy-temp"
