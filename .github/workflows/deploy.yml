@@ -1,0 +1,59 @@
+
+name: Deploy Static Website to AWS EC2
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: self-hosted
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate website files
+        shell: pwsh
+        run: |
+          if (!(Test-Path "site/index.html")) { throw "index.html missing" }
+          if (!(Test-Path "site/styles.css")) { throw "styles.css missing" }
+          if (!(Test-Path "site/script.js")) { throw "script.js missing" }
+          Write-Host "Website files validated successfully"
+
+      - name: Configure SSH
+        shell: pwsh
+        env:
+          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+        run: |
+          $sshDir = Join-Path $HOME ".ssh"
+          New-Item -ItemType Directory -Force -Path $sshDir | Out-Null
+          $keyPath = Join-Path $sshDir "deploy_key"
+          [System.IO.File]::WriteAllText($keyPath, $env:EC2_SSH_KEY)
+          icacls $keyPath /inheritance:r /grant:r "$($env:USERNAME):(R)"
+          "SSH_KEY_PATH=$keyPath" >> $env:GITHUB_ENV
+
+      - name: Deploy website
+        shell: pwsh
+        env:
+          EC2_HOST: ${{ secrets.EC2_HOST }}
+          EC2_USER: ${{ secrets.EC2_USER }}
+        run: |
+          $keyPath = $env:SSH_KEY_PATH
+          $sshDir = Join-Path $HOME ".ssh"
+          $knownHosts = Join-Path $sshDir "known_hosts"
+
+          if (!(Test-Path $knownHosts)) {
+            throw "Verified EC2 host key is not configured yet."
+          }
+
+          ssh -i $keyPath -o UserKnownHostsFile=$knownHosts -o StrictHostKeyChecking=yes "$($env:EC2_USER)@$($env:EC2_HOST)" "mkdir -p /home/ubuntu/deploy-temp"
+          if ($LASTEXITCODE -ne 0) { throw "SSH connection failed" }
+
+          scp -i $keyPath -o UserKnownHostsFile=$knownHosts -o StrictHostKeyChecking=yes -r site/. "$($env:EC2_USER)@$($env:EC2_HOST):/home/ubuntu/deploy-temp/"
+          if ($LASTEXITCODE -ne 0) { throw "File transfer failed" }
+
+          ssh -i $keyPath -o UserKnownHostsFile=$knownHosts -o StrictHostKeyChecking=yes "$($env:EC2_USER)@$($env:EC2_HOST)" "sudo cp -r /home/ubuntu/deploy-temp/. /var/www/html/ && sudo nginx -t && sudo systemctl reload nginx"
+          if ($LASTEXITCODE -ne 0) { throw "Website deployment failed" }
