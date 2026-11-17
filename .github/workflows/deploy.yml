@@ -28,11 +28,21 @@ jobs:
         env:
           EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
         run: |
-          $sshDir = Join-Path $HOME ".ssh"
-          New-Item -ItemType Directory -Force -Path $sshDir | Out-Null
-          $keyPath = Join-Path $sshDir "deploy_key"
+          $keyPath = Join-Path $env:RUNNER_TEMP "ec2_deploy_key"
+
+          if (Test-Path $keyPath) {
+            Remove-Item $keyPath -Force
+          }
+
           [System.IO.File]::WriteAllText($keyPath, $env:EC2_SSH_KEY)
-          icacls $keyPath /inheritance:r /grant:r "$($env:USERNAME):(R)"
+
+          $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
+          icacls $keyPath /inheritance:r /grant:r "${identity}:(R)"
+
+          if ($LASTEXITCODE -ne 0) {
+            throw "Could not set SSH key permissions"
+          }
+
           "SSH_KEY_PATH=$keyPath" >> $env:GITHUB_ENV
 
       - name: Deploy website
