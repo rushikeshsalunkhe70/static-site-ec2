@@ -24,15 +24,17 @@ jobs:
           Write-Host "Website files validated successfully"
 
       
+      
       - name: Configure SSH
         shell: powershell
         env:
-          EC2_SSH_KEY: ${{ secrets.EC2_SSH_KEY }}
+          EC2_SSH_KEY_B64: ${{ secrets.EC2_SSH_KEY_B64 }}
         run: |
           $keyName = "ec2_deploy_key_$($env:GITHUB_RUN_ID)_$($env:GITHUB_RUN_ATTEMPT)"
           $keyPath = Join-Path $env:RUNNER_TEMP $keyName
 
-          [System.IO.File]::WriteAllText($keyPath, $env:EC2_SSH_KEY)
+          $keyBytes = [Convert]::FromBase64String($env:EC2_SSH_KEY_B64)
+          [System.IO.File]::WriteAllBytes($keyPath, $keyBytes)
 
           $identity = [System.Security.Principal.WindowsIdentity]::GetCurrent().Name
           icacls $keyPath /inheritance:r /grant:r "${identity}:(R)"
