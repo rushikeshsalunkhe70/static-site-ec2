@@ -1,22 +1,19 @@
 
-/* Reset default browser spacing */
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
 }
 
-/* Main body */
 body {
     font-family: Arial, sans-serif;
-    background-color: hsl(255, 78%, 60%);
-    color: #333;
+    background-color: #FFF7ED;
+    color: #292524;
 }
 
-/* Header section */
 header {
-    background-color: hsl(193, 75%, 67%);
-    color: #1b1212;
+    background-color: #14532D;
+    color: #FFFFFF;
     text-align: center;
     padding: 50px 20px;
 }
@@ -28,21 +25,21 @@ header h1 {
 
 header p {
     font-size: 16px;
+    color: #DCFCE7;
 }
 
-/* Main section */
 .hero {
     max-width: 700px;
     margin: 60px auto;
     padding: 40px 25px;
-    background-color: hsl(313, 80%, 55%);
+    background-color: #FFFFFF;
     text-align: center;
     border-radius: 12px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: 0 4px 15px rgba(20, 83, 45, 0.12);
 }
 
 .hero h2 {
-    color: #17542d;
+    color: #15803D;
     margin-bottom: 20px;
 }
 
@@ -51,9 +48,8 @@ header p {
     margin-bottom: 20px;
 }
 
-/* Button */
 button {
-    background-color: hsl(228, 16%, 6%);
+    background-color: #F97316;
     color: white;
     border: none;
     padding: 12px 25px;
@@ -63,18 +59,16 @@ button {
 }
 
 button:hover {
-    background-color: #5f7105;
+    background-color: #C2410C;
 }
 
-/* Footer */
 footer {
-    background-color: hsl(36, 93%, 47%);
-    color: #0e0303;
+    background-color: #292524;
+    color: #FFFFFF;
     text-align: center;
     padding: 20px;
 }
 
-/* Mobile responsive design */
 @media (max-width: 600px) {
     header h1 {
         font-size: 24px;
