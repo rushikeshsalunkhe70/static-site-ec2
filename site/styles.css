@@ -15,7 +15,7 @@ body {
 
 /* Header section */
 header {
-    background-color: hsl(86, 62%, 49%);
+    background-color: hsl(193, 75%, 67%);
     color: #1b1212;
     text-align: center;
     padding: 50px 20px;
@@ -42,7 +42,7 @@ header p {
 }
 
 .hero h2 {
-    color: #172554;
+    color: #17542d;
     margin-bottom: 20px;
 }
 
@@ -63,7 +63,7 @@ button {
 }
 
 button:hover {
-    background-color: #1d4ed8;
+    background-color: #5f7105;
 }
 
 /* Footer */
